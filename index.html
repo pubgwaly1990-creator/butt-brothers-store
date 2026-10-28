@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Butt Brothers Store — Premium Digital & Physical Products</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandPrimary: '#0F5132',
+                        brandAccent: '#D4AF37',
+                        brandBg: '#F8F9FA'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-brandBg font-sans text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Header Navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-40 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl font-black tracking-wider text-brandPrimary">BUTT BROTHERS STORE</span>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button onclick="toggleAdminModal()" class="text-xs sm:text-sm font-semibold text-gray-600 hover:text-brandPrimary px-3 py-1.5 rounded-lg border border-gray-200 transition">
+                    <i class="fa-solid fa-user-shield mr-1"></i> Admin Panel
+                </button>
+                <button onclick="toggleCartDrawer()" class="relative bg-brandPrimary text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-opacity-90 transition">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span>Cart</span>
+                    <span id="cartCountBadge" class="bg-brandAccent text-black text-xs font-black rounded-full px-2 py-0.5">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+        <!-- Hero Banner -->
+        <div class="bg-gradient-to-r from-brandPrimary to-emerald-800 rounded-3xl p-6 sm:p-10 text-white mb-8 shadow-lg relative overflow-hidden">
+            <div class="relative z-10 max-w-xl">
+                <span class="bg-brandAccent text-black text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block">Official Store</span>
+                <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-2">Everyday Finds, Elevated.</h1>
+                <p class="text-emerald-100 text-sm sm:text-base mb-6">Discover premium digital services, verified accounts, and exclusive products with instant WhatsApp ordering.</p>
+                
+                <!-- Search Bar -->
+                <div class="relative">
+                    <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search products..." class="w-full bg-white text-gray-900 rounded-xl py-3 pl-10 pr-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brandAccent shadow-sm">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-gray-400"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories Filter -->
+        <div id="categoryContainer" class="flex gap-2 overflow-x-auto pb-4 mb-6 scrollbar-none">
+            <!-- Dynamic Category Buttons -->
+        </div>
+
+        <!-- Product Grid -->
+        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div class="col-span-full py-16 text-center text-gray-500">
+                <i class="fa-solid fa-circle-notch fa-spin text-3xl text-brandPrimary mb-3"></i>
+                <p class="text-sm font-medium">Fetching catalog from Supabase...</p>
+            </div>
+        </div>
+
+        <!-- Customer Feedback Section -->
+        <section class="mt-16 bg-white rounded-3xl p-6 sm:p-10 border border-gray-100 shadow-sm">
+            <div class="text-center max-w-xl mx-auto mb-8">
+                <span class="bg-emerald-100 text-brandPrimary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Testimonials</span>
+                <h2 class="text-2xl font-extrabold text-gray-900 mt-2">What Our Customers Say</h2>
+                <p class="text-gray-500 text-sm mt-1">Real reviews from verified buyers at Butt Brothers Store.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-brandBg p-6 rounded-2xl border border-gray-100">
+                    <div class="flex text-brandAccent text-sm mb-3">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-gray-700 text-sm italic mb-4">"Fast delivery and instant WhatsApp response! Got my digital account details within 5 minutes. Highly recommended."</p>
+                    <span class="font-bold text-xs text-gray-900 block">— Hamza Ali, Lahore</span>
+                </div>
+                <div class="bg-brandBg p-6 rounded-2xl border border-gray-100">
+                    <div class="flex text-brandAccent text-sm mb-3">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-gray-700 text-sm italic mb-4">"Amazing service! Paid via OPay and shared the screenshot on WhatsApp. Super smooth transaction."</p>
+                    <span class="font-bold text-xs text-gray-900 block">— Zeeshan Butt, Faisalabad</span>
+                </div>
+                <div class="bg-brandBg p-6 rounded-2xl border border-gray-100">
+                    <div class="flex text-brandAccent text-sm mb-3">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-gray-700 text-sm italic mb-4">"Best store for creator gear and accounts. Genuine people and reliable management."</p>
+                    <span class="font-bold text-xs text-gray-900 block">— Bilal Ahmed, Karachi</span>
+                </div>
+            </div>
+
+            <!-- Feedback Submission Form -->
+            <div class="max-w-xl mx-auto bg-brandBg p-6 rounded-2xl border border-gray-200">
+                <h3 class="text-sm font-bold text-gray-900 mb-3"><i class="fa-solid fa-pen-nib mr-1 text-brandPrimary"></i> Leave Your Feedback</h3>
+                <div class="space-y-3">
+                    <input type="text" id="feedbackName" placeholder="Your Name *" class="w-full border rounded-xl p-2.5 text-sm bg-white border-gray-300">
+                    <textarea id="feedbackText" rows="2" placeholder="Write your review here... *" class="w-full border rounded-xl p-2.5 text-sm bg-white border-gray-300"></textarea>
+                    <button onclick="submitFeedback()" class="w-full bg-brandPrimary text-white py-2.5 rounded-xl font-bold text-xs hover:bg-opacity-90 transition">Submit Review</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Admin Modal -->
+    <div id="adminModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b">
+                <h3 class="text-lg font-bold text-gray-900">Admin Panel (Restricted)</h3>
+                <button onclick="toggleAdminModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+
+            <!-- Security PIN Auth Step -->
+            <div id="pinStep" class="space-y-4">
+                <p class="text-xs text-gray-600">Enter secure administrative PIN to proceed:</p>
+                <input type="password" id="adminPinInput" placeholder="Enter Admin PIN" class="w-full border rounded-xl p-3 text-center text-lg tracking-widest font-mono border-gray-300">
+                <button onclick="verifyPin()" class="w-full bg-brandPrimary text-white py-2.5 rounded-xl font-bold hover:bg-opacity-90">Verify Security PIN</button>
+            </div>
+
+            <!-- Dashboard with Tabs -->
+            <div id="adminPanelStep" class="hidden space-y-4">
+                <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl">
+                    <span class="text-xs font-bold text-emerald-700"><i class="fa-solid fa-shield-check mr-1"></i> Owner Access Active</span>
+                    <button onclick="logoutAdmin()" class="text-xs font-bold text-red-600 hover:underline">Lock Panel</button>
+                </div>
+
+                <!-- Admin Navigation Tabs -->
+                <div class="flex border-b border-gray-200">
+                    <button type="button" id="tabBtnProducts" onclick="switchAdminTab('products')" class="flex-1 py-2 text-xs font-bold text-center border-b-2 border-brandPrimary text-brandPrimary cursor-pointer">
+                        <i class="fa-solid fa-box mr-1"></i> Product Manager (Add/Edit)
+                    </button>
+                    <button type="button" id="tabBtnImages" onclick="switchAdminTab('images')" class="flex-1 py-2 text-xs font-bold text-center border-b-2 border-transparent text-gray-500 hover:text-brandPrimary cursor-pointer">
+                        <i class="fa-solid fa-image mr-1"></i> Image Uploader
+                    </button>
+                </div>
+
+                <!-- TAB 1: PRODUCT MANAGER -->
+                <div id="tabContentProducts" class="space-y-4">
+                    <h4 id="formTitle" class="font-bold text-sm text-gray-800 border-b pb-1">Add New Product</h4>
+                    <input type="hidden" id="editProductId">
+
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">Product Name *</label>
+                                <input type="text" id="prodTitle" placeholder="e.g. Verified TikTok Account" required class="w-full border rounded-lg p-2.5 text-sm border-gray-300">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">Price (PKR) *</label>
+                                <input type="number" id="prodPrice" placeholder="2499" required class="w-full border rounded-lg p-2.5 text-sm border-gray-300">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">Category *</label>
+                                <select id="prodCategory" class="w-full border rounded-lg p-2.5 text-sm border-gray-300">
+                                    <option value="TikTok Accounts">TikTok Accounts</option>
+                                    <option value="SMM Services">SMM Services</option>
+                                    <option value="Creator Gear">Creator Gear</option>
+                                    <option value="General">General</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">Stock Status</label>
+                                <select id="prodStock" class="w-full border rounded-lg p-2.5 text-sm border-gray-300">
+                                    <option value="Available">Available (In Stock)</option>
+                                    <option value="Sold Out">Sold Out</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Description</label>
+                            <textarea id="prodDesc" rows="2" placeholder="Short product description" class="w-full border rounded-lg p-2.5 text-sm border-gray-300"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Product Image URL *</label>
+                            <input type="text" id="prodImageUrl" placeholder="Paste Image URL or upload via Image Tab" oninput="updateFormImagePreview()" class="w-full border rounded-lg p-2.5 text-sm border-gray-300">
+                            
+                            <div id="imagePreviewContainer" class="mt-2 hidden">
+                                <span class="text-[10px] text-gray-500 block mb-1">Live Image Preview:</span>
+                                <img id="imagePreview" src="" alt="Preview" class="h-24 w-auto rounded-lg object-cover border border-gray-200">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 pt-2">
+                        <button onclick="saveProduct()" class="flex-1 bg-brandPrimary text-white py-2.5 rounded-xl font-bold text-sm hover:bg-opacity-90">Save Product to Database</button>
+                        <button onclick="resetAdminForm()" class="bg-gray-100 text-gray-700 px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-gray-200">Cancel</button>
+                    </div>
+                </div>
+
+                <!-- TAB 2: IMAGE UPLOADER TAB -->
+                <div id="tabContentImages" class="hidden space-y-4">
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-800">
+                        <p class="font-bold mb-1"><i class="fa-solid fa-circle-info mr-1"></i> Dedicated Image Manager</p>
+                        <p>Upload product images from your device. Once uploaded, click "Copy & Use URL" to assign it instantly.</p>
+                    </div>
+
+                    <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:border-brandPrimary transition bg-gray-50">
+                        <i class="fa-solid fa-cloud-arrow-up text-2xl text-brandPrimary mb-2"></i>
+                        <p class="text-xs font-bold text-gray-700 mb-2">Select Image File</p>
+                        <input type="file" id="tabImageFileInput" accept="image/*" onchange="uploadImageFromTab(event)" class="text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-brandPrimary file:text-white hover:file:bg-opacity-90">
+                    </div>
+
+                    <div id="tabUploadSpinner" class="text-xs font-semibold text-brandPrimary text-center hidden">
+                        <i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Uploading to Cloud...
+                    </div>
+
+                    <div class="space-y-2">
+                        <h5 class="text-xs font-bold text-gray-700">Uploaded Images History:</h5>
+                        <div id="uploadedGallery" class="grid grid-cols-2 gap-3 max-h-48 overflow-y-auto">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Drawer -->
+    <div id="cartDrawer" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex justify-end">
+        <div class="bg-white w-full max-w-md h-full flex flex-col justify-between p-6 shadow-2xl">
+            <div>
+                <div class="flex justify-between items-center border-b pb-4 mb-4">
+                    <h3 class="text-lg font-bold text-gray-900"><i class="fa-solid fa-bag-shopping mr-2 text-brandPrimary"></i>Your Shopping Cart</h3>
+                    <button onclick="toggleCartDrawer()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+                </div>
+                <div id="cartItemsList" class="space-y-3 max-h-[40vh] overflow-y-auto">
+                    <!-- Cart items populated via JS -->
+                </div>
+            </div>
+
+            <div class="border-t pt-4 space-y-3">
+                <div class="flex justify-between text-base font-extrabold text-gray-900">
+                    <span>Total Amount:</span>
+                    <span id="cartTotalDisplay">Rs. 0</span>
+                </div>
+
+                <div class="space-y-2 pt-2">
+                    <input type="text" id="custName" placeholder="Your Full Name *" class="w-full border rounded-lg p-2 text-sm border-gray-300">
+                    <input type="text" id="custPhone" placeholder="WhatsApp Phone Number *" class="w-full border rounded-lg p-2 text-sm border-gray-300">
+                    <textarea id="custAddress" rows="2" placeholder="Delivery Address / Order Notes *" class="w-full border rounded-lg p-2 text-sm border-gray-300"></textarea>
+                </div>
+
+                <!-- Bank Accounts Info -->
+                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-gray-700 space-y-1">
+                    <p class="font-bold text-brandPrimary mb-1"><i class="fa-solid fa-university mr-1"></i> Official Bank Accounts:</p>
+                    <p>• <b>OPay:</b> 0302-8372072 <br> <span class="text-gray-500">Title: Usman Amjad</span></p>
+                    <p>• <b>MCB Islamic Bank:</b> 1591000414530002 <br> <span class="text-gray-500">Title: Usman Amjad S/O Amanullah</span></p>
+                    <p class="text-[10px] text-gray-500 mt-1">Send payment screenshot via WhatsApp after ordering.</p>
+                </div>
+
+                <button onclick="checkoutToWhatsApp()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-700 transition shadow-md">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Complete Order via WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-8 border-t border-gray-800 text-xs">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-3">
+            <p class="text-white font-bold text-sm">BUTT BROTHERS STORE — Everyday Finds, Elevated</p>
+            <p>Direct Support & WhatsApp Orders: <a href="https://wa.me/923028372072" class="text-brandAccent hover:underline">0302-8372072 (Usman Amjad)</a></p>
+            <p>&copy; 2026 Butt Brothers Store. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Application Script -->
+    <script>
+        const SUPABASE_URL = "https://iipgfiyrahscxyhmdlly.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcGdmaXlyYWhzY3h5aG1kbGx5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMwNzkwMzksImV4cCI6MjEwODY1NTAzOX0.gEgNPl-kpFeIlPHxvAYU9IYDbO-74mpPOcwh9ufnBb4";
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const IMGBB_API_KEY = "c1b0aa4f8b9cb030a08e67f0f673f8ff";
+        const ADMIN_PIN = "7860"; // Aap apna secure PIN yahan change kar sakte hain
+
+        let productsState = [];
+        let cartState = JSON.parse(localStorage.getItem('butt_brothers_cart') || '[]');
+        let uploadedImagesList = JSON.parse(localStorage.getItem('butt_brothers_gallery') || '[]');
+        let currentFilter = 'All';
+        let searchQuery = '';
+        let isAdminLoggedIn = false;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchProducts();
+            updateCartUI();
+            renderGalleryHistory();
+        });
+
+        async function fetchProducts() {
+            try {
+                const { data, error } = await supabase
+                    .from('products')
+                    .select('*');
+
+                if (error) throw error;
+                productsState = data || [];
+                renderCategories();
+                renderProducts();
+            } catch (err) {
+                console.error("Error loading products:", err);
+                document.getElementById('productGrid').innerHTML = `
+                    <div class="col-span-full text-center py-12 text-red-500 font-semibold">
+                        Failed to load catalog. Please check Supabase table connection.
+                    </div>
+                `;
+            }
+        }
+
+        function renderCategories() {
+            const categories = ['All', ...new Set(productsState.map(p => p.category))];
+            const container = document.getElementById('categoryContainer');
+            if(!container) return;
+            
+            container.innerHTML = categories.map(cat => `
+                <button onclick="filterCategory('${cat}')" 
+                        class="px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition ${currentFilter === cat ? 'bg-brandPrimary text-white shadow-md' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function filterCategory(cat) {
+            currentFilter = cat;
+            renderCategories();
+            renderProducts();
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            if(!grid) return;
+
+            const filtered = productsState.filter(p => {
+                const matchesCat = currentFilter === 'All' || p.category === currentFilter;
+                const matchesSearch = p.title.toLowerCase().includes(searchQuery) || (p.description && p.description.toLowerCase().includes(searchQuery));
+                return matchesCat && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-gray-500 font-medium">
+                        No products found in catalog. Use Admin Panel to add products!
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(product => {
+                const img = product.image_url || 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?w=500';
+                return `
+                    <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                        <div>
+                            <div class="relative h-48 bg-gray-100 overflow-hidden">
+                                <img src="${img}" alt="${product.title}" class="w-full h-full object-cover">
+                                <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-gray-800 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                                    ${product.category}
+                                </span>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="font-bold text-gray-900 text-base mb-1 line-clamp-1">${product.title}</h3>
+                                <p class="text-xs text-gray-500 mb-3 line-clamp-2">${product.description || 'Premium product available for instant WhatsApp delivery.'}</p>
+                                <div class="flex items-baseline justify-between mb-3">
+                                    <span class="text-lg font-extrabold text-brandPrimary">Rs. ${Number(product.price).toLocaleString()}</span>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded ${product.stock === 'Sold Out' ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-700'}">${product.stock || 'Available'}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 pt-0 flex gap-2">
+                            <button onclick="addToCart('${product.id}')" class="flex-1 bg-brandPrimary text-white py-2.5 rounded-xl font-bold text-xs hover:bg-opacity-90 transition">
+                                <i class="fa-solid fa-cart-plus mr-1"></i> Add to Cart
+                            </button>
+                            ${isAdminLoggedIn ? `
+                                <button onclick="setupEditProduct('${product.id}')" class="bg-amber-100 text-amber-800 px-3 py-2.5 rounded-xl font-bold text-xs hover:bg-amber-200" title="Edit Product">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button onclick="deleteProduct('${product.id}')" class="bg-red-100 text-red-600 px-3 py-2.5 rounded-xl font-bold text-xs hover:bg-red-200" title="Delete Product">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function verifyPin() {
+            const enteredPin = document.getElementById('adminPinInput').value.trim();
+            if (enteredPin === ADMIN_PIN) {
+                isAdminLoggedIn = true;
+                document.getElementById('pinStep').classList.add('hidden');
+                document.getElementById('adminPanelStep').classList.remove('hidden');
+                renderProducts();
+                alert('Welcome Usman! Admin panel unlocked successfully.');
+            } else {
+                alert('Incorrect Security PIN!');
+            }
+        }
+
+        function logoutAdmin() {
+            isAdminLoggedIn = false;
+            document.getElementById('adminPanelStep').classList.add('hidden');
+            document.getElementById('pinStep').classList.remove('hidden');
+            document.getElementById('adminPinInput').value = '';
+            renderProducts();
+            toggleAdminModal();
+        }
+
+        function switchAdminTab(tabName) {
+            const btnProducts = document.getElementById('tabBtnProducts');
+            const btnImages = document.getElementById('tabBtnImages');
+            const contentProducts = document.getElementById('tabContentProducts');
+            const contentImages = document.getElementById('tabContentImages');
+
+            if (tabName === 'products') {
+                btnProducts.className = "flex-1 py-2 text-xs font-bold text-center border-b-2 border-brandPrimary text-brandPrimary cursor-pointer";
+                btnImages.className = "flex-1 py-2 text-xs font-bold text-center border-b-2 border-transparent text-gray-500 hover:text-brandPrimary cursor-pointer";
+                contentProducts.classList.remove('hidden');
+                contentImages.classList.add('hidden');
+            } else {
+                btnImages.className = "flex-1 py-2 text-xs font-bold text-center border-b-2 border-brandPrimary text-brandPrimary cursor-pointer";
+                btnProducts.className = "flex-1 py-2 text-xs font-bold text-center border-b-2 border-transparent text-gray-500 hover:text-brandPrimary cursor-pointer";
+                contentImages.classList.remove('hidden');
+                contentProducts.classList.add('hidden');
+            }
+        }
+
+        async function saveProduct() {
+            const id = document.getElementById('editProductId').value;
+            const title = document.getElementById('prodTitle').value.trim();
+            const price = parseFloat(document.getElementById('prodPrice').value);
+            const category = document.getElementById('prodCategory').value;
+            const stock = document.getElementById('prodStock').value;
+            const description = document.getElementById('prodDesc').value.trim();
+            const image_url = document.getElementById('prodImageUrl').value.trim();
+
+            if (!title || !price || !image_url) {
+                alert('Please fill in Product Name, Price, and Image URL.');
+                return;
+            }
+
+            const productData = { title, price, category, stock, description, image_url };
+
+            try {
+                if (id) {
+                    // Update existing product
+                    const { error } = await supabase.from('products').update(productData).eq('id', id);
+                    if (error) throw error;
+                    alert('Product updated successfully!');
+                } else {
+                    // Insert new product
+                    const { error } = await supabase.from('products').insert([productData]);
+                    if (error) throw error;
+                    alert('Product added successfully!');
+                }
+
+                resetAdminForm();
+                fetchProducts();
+            } catch (err) {
+                alert('Error saving product: ' + err.message);
+            }
+        }
+
+        function setupEditProduct(id) {
+            const product = productsState.find(p => p.id == id);
+            if (!product) return;
+
+            document.getElementById('editProductId').value = product.id;
+            document.getElementById('prodTitle').value = product.title;
+            document.getElementById('prodPrice').value = product.price;
+            document.getElementById('prodCategory').value = product.category;
+            document.getElementById('prodStock').value = product.stock || 'Available';
+            document.getElementById('prodDesc').value = product.description || '';
+            document.getElementById('prodImageUrl').value = product.image_url || '';
+            document.getElementById('formTitle').textContent = 'Edit Product';
+            updateFormImagePreview();
+            switchAdminTab('products');
+            
+            // Open modal if closed
+            document.getElementById('adminModal').classList.remove('hidden');
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm('Are you sure you want to delete this product?')) return;
+
+            try {
+                const { error } = await supabase.from('products').delete().eq('id', id);
+                if (error) throw error;
+                alert('Product deleted successfully!');
+                fetchProducts();
+            } catch (err) {
+                alert('Error deleting product: ' + err.message);
+            }
+        }
+
+        function resetAdminForm() {
+            document.getElementById('editProductId').value = '';
+            document.getElementById('prodTitle').value = '';
+            document.getElementById('prodPrice').value = '';
+            document.getElementById('prodDesc').value = '';
+            document.getElementById('prodImageUrl').value = '';
+            document.getElementById('imagePreviewContainer').classList.add('hidden');
+            document.getElementById('formTitle').textContent = 'Add New Product';
+        }
+
+        async function uploadImageFromTab(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const spinner = document.getElementById('tabUploadSpinner');
+            spinner.classList.remove('hidden');
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    const url = result.data.url;
+                    uploadedImagesList.unshift(url);
+                    localStorage.setItem('butt_brothers_gallery', JSON.stringify(uploadedImagesList));
+                    renderGalleryHistory();
+                    
+                    document.getElementById('prodImageUrl').value = url;
+                    updateFormImagePreview();
+                    alert('Image uploaded successfully! URL set in product form.');
+                } else {
+                    alert('Failed to upload image.');
+                }
+            } catch (err) {
+                alert('Upload error: ' + err.message);
+            } finally {
+                spinner.classList.add('hidden');
+                document.getElementById('tabImageFileInput').value = '';
+            }
+        }
+
+        function renderGalleryHistory() {
+            const gallery = document.getElementById('uploadedGallery');
+            if (!gallery) return;
+
+            if (uploadedImagesList.length === 0) {
+                gallery.innerHTML = `<p class="col-span-2 text-center text-xs text-gray-400 py-4">No images uploaded yet.</p>`;
+                return;
+            }
+
+            gallery.innerHTML = uploadedImagesList.map(url => `
+                <div class="border rounded-lg p-2 bg-white flex flex-col items-center gap-2 shadow-sm">
+                    <img src="${url}" class="h-20 w-full object-cover rounded">
+                    <button onclick="copyAndUseImageUrl('${url}')" class="w-full bg-brandPrimary text-white py-1 rounded text-[10px] font-bold hover:bg-opacity-90">
+                        <i class="fa-solid fa-copy mr-1"></i> Use URL
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function copyAndUseImageUrl(url) {
+            document.getElementById('prodImageUrl').value = url;
+            updateFormImagePreview();
+            switchAdminTab('products');
+            alert('URL applied to Product Form!');
+        }
+
+        function updateFormImagePreview() {
+            const url = document.getElementById('prodImageUrl').value.trim();
+            const preview = document.getElementById('imagePreview');
+            const container = document.getElementById('imagePreviewContainer');
+
+            if (url && preview && container) {
+                preview.src = url;
+                container.classList.remove('hidden');
+            } else if (container) {
+                container.classList.add('hidden');
+            }
+        }
+
+        function addToCart(productId) {
+            const product = productsState.find(p => p.id == productId);
+            if (!product) return;
+
+            const existing = cartState.find(item => item.id == productId);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cartState.push({ ...product, qty: 1 });
+            }
+
+            saveCart();
+            toggleCartDrawer(true);
+        }
+
+        function updateQty(productId, change) {
+            const item = cartState.find(i => i.id == productId);
+            if (!item) return;
+
+            item.qty += change;
+            if (item.qty <= 0) {
+                cartState = cartState.filter(i => i.id == productId);
+            }
+            saveCart();
+        }
+
+        function saveCart() {
+            localStorage.setItem('butt_brothers_cart', JSON.stringify(cartState));
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const totalQty = cartState.reduce((sum, item) => sum + item.qty, 0);
+            const totalPrice = cartState.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+            const badge = document.getElementById('cartCountBadge');
+            const totalDisp = document.getElementById('cartTotalDisplay');
+            if(badge) badge.textContent = totalQty;
+            if(totalDisp) totalDisp.textContent = `Rs. ${totalPrice.toLocaleString()}`;
+
+            const list = document.getElementById('cartItemsList');
+            if(!list) return;
+
+            if (cartState.length === 0) {
+                list.innerHTML = `<p class="text-center text-sm text-gray-500 py-8">Your cart is currently empty.</p>`;
+                return;
+            }
+
+            list.innerHTML = cartState.map(item => `
+                <div class="flex items-center justify-between bg-gray-50 p-3 rounded-xl border border-gray-100">
+                    <div class="flex-1">
+                        <h4 class="font-bold text-xs text-gray-900">${item.title}</h4>
+                        <p class="text-[11px] text-gray-500">Rs. ${Number(item.price).toLocaleString()} x ${item.qty}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="updateQty('${item.id}', -1)" class="w-6 h-6 rounded-lg bg-gray-200 font-bold text-xs text-gray-700 hover:bg-gray-300">-</button>
+                        <span class="text-xs font-extrabold text-gray-800">${item.qty}</span>
+                        <button onclick="updateQty('${item.id}', 1)" class="w-6 h-6 rounded-lg bg-gray-200 font-bold text-xs text-gray-700 hover:bg-gray-300">+</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function checkoutToWhatsApp() {
+            if (cartState.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
+
+            if (!name || !phone || !address) {
+                alert('Please fill in your Name, WhatsApp Phone Number, and Address/Notes.');
+                return;
+            }
+
+            let text = `🛒 *NEW ORDER - BUTT BROTHERS STORE*\n\n`;
+            text += `👤 *Customer Details:*\n`;
+            text += `• Name: ${name}\n`;
+            text += `• Phone: ${phone}\n`;
+            text += `• Address/Notes: ${address}\n\n`;
+
+            text += `📦 *Order Items:*\n`;
+            let total = 0;
+            cartState.forEach((item, idx) => {
+                const sub = item.price * item.qty;
+                total += sub;
+                text += `${idx + 1}. ${item.title} x${item.qty} = Rs. ${sub.toLocaleString()}\n`;
+            });
+
+            text += `\n💰 *Total Amount:* Rs. ${total.toLocaleString()}\n\n`;
+            text += `💳 *Payment Method Selected:*\n`;
+            text += `• OPay: 0302-8372072 (Usman Amjad)\n`;
+            text += `• MCB Islamic: 15911591000414530002 (Usman Amjad S/O Amanullah)\n\n`;
+            text += `📎 *Note:* Payment screenshot attached / sending now.`;
+
+            const waNum = "923028372072";
+            const waUrl = `https://wa.me/${waNum}?text=${encodeURIComponent(text)}`;
+            window.open(waUrl, '_blank');
+        }
+
+        function submitFeedback() {
+            const name = document.getElementById('feedbackName').value.trim();
+            const text = document.getElementById('feedbackText').value.trim();
+
+            if (!name || !text) {
+                alert('Please fill in both name and review text.');
+                return;
+            }
+
+            alert('Thank you! Your feedback has been received successfully.');
+            document.getElementById('feedbackName').value = '';
+            document.getElementById('feedbackText').value = '';
+        }
+
+        function toggleCartDrawer(open) {
+            const drawer = document.getElementById('cartDrawer');
+            if (!drawer) return;
+            if (open === true) {
+                drawer.classList.remove('hidden');
+            } else if (open === false) {
+                drawer.classList.add('hidden');
+            } else {
+                drawer.classList.toggle('hidden');
+            }
+        }
+
+        function toggleAdminModal() {
+            const modal = document.getElementById('adminModal');
+            if (modal) {
+                modal.classList.toggle('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
