@@ -707,13 +707,19 @@
             window.open(waUrl, '_blank');
         }
 
-        function submitFeedback() {
+        window.submitFeedback = function() {
             const name = document.getElementById('feedbackName').value.trim();
             const text = document.getElementById('feedbackText').value.trim();
 
             if (!name || !text) {
                 alert('Please fill in both name and review text.');
                 return;
+            }
+
+            alert('Thank you! Your feedback has been received successfully.');
+            document.getElementById('feedbackName').value = '';
+            document.getElementById('feedbackText').value = '';
+        };
             }
 
             alert('Thank you! Your feedback has been received successfully.');
